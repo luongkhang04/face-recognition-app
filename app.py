@@ -25,7 +25,7 @@ class FaceNetEmbedding(nn.Module):
         super(FaceNetEmbedding, self).__init__()
         self.model = InceptionResnetV1(pretrained='vggface2', classify=False)
         self.projector = nn.Linear(512, 128)
-        self.load_state_dict(torch.load(MODEL_PATH))
+        self.load_state_dict(torch.load(MODEL_PATH), map_location='cpu')
     def forward(self, x):
         x = self.model(x)          # [batch_size, 512]
         x = self.projector(x)      # [batch_size, embedding_dim]
