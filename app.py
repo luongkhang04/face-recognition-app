@@ -1,6 +1,6 @@
 import os
-import torch
 import numpy as np
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from flask import Flask, render_template, request, jsonify
@@ -12,6 +12,10 @@ from io import BytesIO
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Check if GPU is available
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
 
 # Directories
 EMBEDDING_DIR = 'embeddings'
@@ -25,7 +29,7 @@ class FaceNetEmbedding(nn.Module):
         super(FaceNetEmbedding, self).__init__()
         self.model = InceptionResnetV1(pretrained='vggface2', classify=False)
         self.projector = nn.Linear(512, 128)
-        self.load_state_dict(torch.load(MODEL_PATH), map_location='cpu')
+        self.load_state_dict(torch.load(MODEL_PATH, map_location=device))
     def forward(self, x):
         x = self.model(x)          # [batch_size, 512]
         x = self.projector(x)      # [batch_size, embedding_dim]
@@ -33,9 +37,9 @@ class FaceNetEmbedding(nn.Module):
         return x
 
 # Load mtcnn model
-mtcnn = MTCNN(image_size=160, margin=0)
+mtcnn = MTCNN(image_size=160, margin=0).to(device)
 # Load the embeddings model
-facenet = FaceNetEmbedding()
+facenet = FaceNetEmbedding().to(device)
 # Load the saved weights
 facenet.eval()
 
