@@ -19,7 +19,7 @@ print(f"Using device: {device}")
 
 # Directories
 EMBEDDING_DIR = 'embeddings'
-MODEL_PATH = 'best_facenet_model_manhattan_9805.pth'
+MODEL_PATH = 'best_facenet_model_manhattan_9830.pth'
 if not os.path.exists(EMBEDDING_DIR):
     os.makedirs(EMBEDDING_DIR)
 
@@ -37,9 +37,9 @@ class FaceNetEmbedding(nn.Module):
         return x
 
 # Load mtcnn model
-mtcnn = MTCNN(image_size=160, margin=0).to(device)
+mtcnn = MTCNN(image_size=160, margin=0)
 # Load the embeddings model
-facenet = FaceNetEmbedding().to(device)
+facenet = FaceNetEmbedding()
 # Load the saved weights
 facenet.eval()
 
@@ -109,5 +109,4 @@ def recognize():
     return jsonify({"name": "No face", "similarity": 0})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True)
