@@ -121,5 +121,53 @@ Trong không gian nhiều chiều, L₁ có khả năng làm nổi bật các kh
 * Đầu ra là vector embedding kích thước 128 chiều.
 
 ## Thực nghiệm
+### Bộ dữ liệu
+Dữ liệu huấn luyện: [CASIA-Webface](https://www.kaggle.com/datasets/ntl0601/casia-webface)
+
+Dữ liệu test: [Labelled Faces in the Wild (LFW)](https://www.kaggle.com/datasets/jessicali9530/lfw-dataset)
+
+Trước khi huấn luyện và đánh giá mô hình, dự án thực hiện căn chỉnh các ảnh trong bộ dữ liệu:
+*	Aligning CASIA thu được 394247 ảnh của 10572 người.
+*	Aligning LFW thu được 9107 ảnh của 1680 người.
+
+### Tiến hành thực nghiệm
+Dự án huấn luyện mô hình ResNet-50 theo phương pháp Arcface, chọn tham số $s=30$, $m=0.5$, tối ưu sử dụng SGD với $learning rate=0.01$ và $momentum=0.9$. Chạy 20 epochs, giảm learning rate 70% sau mỗi 10 epoch.
+
+Huấn luyện mô hình Inception-Resnet V1 theo phương pháp Facenet, chọn tham số $margin=0.3$, tối ưu sử dụng Adam với $learning rate={10}^{-5}$. Chạy 20 epochs, giảm learning rate 70% sau mỗi 10 epoch. 
+
+Sau mỗi epoch, mô hình được test trên 6000 cặp ảnh LFW, tính ngưỡng khoảng cách tốt nhất (threshold) để phân loại cùng người/ khác người.
+
+Mã nguồn chạy thực nghiệm:
+
+Phương pháp Arcface: https://www.kaggle.com/code/luongkhang04/arcface-pytorch
+
+Phương pháp Facenet với khoảng cách Euclid: https://www.kaggle.com/code/luongkhang04/facenet-pytorch
+
+Phương pháp Facenet với khoảng cách Manhattan: https://www.kaggle.com/code/luongkhang04/facenet-pytorch-manhattan
+ 
+### Kết quả thực nghiệm
+| Method |	Accuracy |	Threshold |
+| :-----: | :-----: | :-----: |
+| Arcface |	95.87% |	1.1546 |
+| Euclidean Facenet |	97.58% |	1.0363 |
+| Manhattan Facenet |	98.30% |	0.6936 |
+
 
 ## Phần mềm
+Dự án xây dựng một phần mềm đơn giản để minh họa việc sử dụng mô hình để nhận diện khuôn mặt từ webcam.
+
+### Tính năng phần mềm
+*	Nhận diện khuôn mặt thời gian thực từ webcam.
+*	Cho phép đăng ký khuôn mặt người dùng mới.
+
+### Kiến trúc phần mềm
+Webcam &rarr;
+MTCNN: Detect & Align &rarr;
+Embedding Model &rarr;
+Compare embeddings &rarr;
+Result
+
+### Mã nguồn
+Mã nguồn: https://github.com/luongkhang04/face-recognition-app
+
+Phiên bản đã triển khai: https://face-recognition-app-vg06.onrender.com
