@@ -7,13 +7,16 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Register Face</h1>
-    <input type="text" id="name" placeholder="Enter your name">
-    <video id="video" autoplay></video>
-    <button onclick="register()">Register</button>
-    <p id="result"></p>
-  </div>
+  <form onsubmit="event.preventDefault(); register();">
+    <div class="container">
+      <h1>Register Face</h1>
+      <input type="text" id="name" placeholder="Enter your name" required>
+      <video id="video" autoplay></video>
+      <button type="submit">Register</button>
+      <p id="result"></p>
+      <img id="face" src="">
+    </div>
+  </form>
   <script src="/static/script.js"></script>
 </body>
 </html>

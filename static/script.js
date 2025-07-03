@@ -23,7 +23,13 @@ function register() {
   })
   .then(res => res.json())
   .then(data => {
-    document.getElementById('result').innerText = data.status === 'success' ? 'Registered!' : 'Failed: ' + data.reason;
+    if (data.status == 'success') {
+      document.getElementById('result').innerText = `${name} registered!`;
+      document.getElementById('face').src = data.face;
+      document.getElementById('face').style.display = 'inline';
+    } else {
+      document.getElementById('result').innerText = 'Failed: ' + data.reason;
+    }
   });
 }
 
@@ -37,5 +43,7 @@ function recognize() {
   .then(res => res.json())
   .then(data => {
     document.getElementById('result').innerText = `Name: ${data.name}, Similarity: ${data.similarity.toFixed(2)}`;
+    document.getElementById('face').src = data.face;
+    document.getElementById('face').style.display = 'inline';
   });
 }

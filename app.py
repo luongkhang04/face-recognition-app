@@ -85,7 +85,13 @@ def save_face():
         embedding = facenet(face.unsqueeze(0)).detach().squeeze()
         embedding = F.normalize(embedding, p=1, dim=0)
         torch.save(embedding, os.path.join(EMBEDDING_DIR, f"{name}.pt"))
-        return jsonify({"status": "success"})
+        # Convert face tensor to PIL image and then to base64 string for JSON
+        face_img = ((face.permute(1, 2, 0) + 1) / 2).clamp(0, 1).mul(255).byte().cpu().numpy()
+        pil_face = Image.fromarray(face_img)
+        buffered = BytesIO()
+        pil_face.save(buffered, format="PNG")
+        face_b64 = "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
+        return jsonify({"status": "success", "face": face_b64})
     return jsonify({"status": "fail", "reason": "No face detected"})
 
 @app.route('/recognize', methods=['POST'])
@@ -105,9 +111,14 @@ def recognize():
             if sim > max_sim:
                 max_sim = sim
                 identity = name if sim > 0.7 else "Unknown"
-        return jsonify({"name": identity, "similarity": float(max_sim)})
-    return jsonify({"name": "No face", "similarity": 0})
+        # Convert face tensor to PIL image and then to base64 string for JSON
+        face_img = ((face.permute(1, 2, 0) + 1) / 2).clamp(0, 1).mul(255).byte().cpu().numpy()
+        pil_face = Image.fromarray(face_img)
+        buffered = BytesIO()
+        pil_face.save(buffered, format="PNG")
+        face_b64 = "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
+        return jsonify({"face": face_b64, "name": identity, "similarity": float(max_sim)})
+    return jsonify({"face": None, "name": "No face", "similarity": 0})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True)
